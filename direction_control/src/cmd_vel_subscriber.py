@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from functii_cu_masuratori import move_motors
+from functions+.py import move_motors
 
 def cmd_vel_callback(msg):
     x = msg.linear.x
