@@ -7,8 +7,8 @@ from numpy import pi
 # Robot wheels
 wheel_length = 25.15
 wheel_distance = 30
-lung = wheel_distance*pi*2
-velocity_100 = 24 # cm/s --- fac test pe birou
+length = wheel_distance*pi*2
+velocity_100 = 24 # cm/s
 
 # Setup communication with Arduino
 board = pyfirmata.ArduinoMega('/dev/ttyUSB0')
@@ -21,7 +21,6 @@ M1INA = board.get_pin('d:22:o')
 M1INB = board.get_pin('d:23:o')
 M2INA = board.get_pin('d:24:o')
 M2INB = board.get_pin('d:25:o')
-x = board.get_pin('d:13:p')
 
 # Function to turn off all motors
 def power_off_all_motors():
@@ -55,15 +54,15 @@ def move_motors(linear, angular):
         vel_left = vel
         vel_right = vel
 
-        procent = abs(angular)*100/(2*pi)  # procent din 2pi [%]
-        lung_echiv = procent*lung/100   # lungimea echivalenta pe cerc [cm]
-        vit_scazuta = (lung_echiv)/(abs(linear)+lung_echiv) # [0-1]
+        percentage = abs(angular)*100/(2*pi)  # percentage of 2pi [%]
+        equivalent_length = percentage*length/100   # equivalent length on the circle [cm]
+        vel_dec = (equivalent_length)/(abs(linear)+equivalent_length) # [0-1] decremented velocity
         
         if angular >= 0:
-            vel_left -= vit_scazuta
+            vel_left -= vel_dec
         else:
-            vel_right -= vit_scazuta
-        time_to_wait = abs(linear)/((vel-vit_scazuta)*velocity_100) # [s]
+            vel_right -= vel_dec
+        time_to_wait = abs(linear)/((vel-vel_dec)*velocity_100) # [s]
         
         print("vel_left = ", vel_left)
         print("vel_right = ", vel_right)
@@ -91,8 +90,6 @@ if __name__ == '__main__':
     try:
         # Main control loop
         #while True:
-        #    x.write(1)
-        #    time.sleep(5)
         move_motors(30, 0)
         
     except KeyboardInterrupt:
